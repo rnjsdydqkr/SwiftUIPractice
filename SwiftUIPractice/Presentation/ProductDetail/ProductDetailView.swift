@@ -10,6 +10,7 @@ import SwiftUI
 struct ProductDetailView: View {
   
   @State private var viewModel: ProductDetailViewModel
+  @Environment(FavoriteManager.self) private var favoriteManager
   
   private let container: AppContainer
   init(container: AppContainer, productId: Int) {
@@ -24,10 +25,10 @@ struct ProductDetailView: View {
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Button {
-            viewModel.isLiked.toggle()
+            favoriteManager.toggleLike(String(viewModel.productId))
           } label: {
-            Image(systemName: viewModel.isLiked ? "heart.fill" : "heart")
-              .foregroundColor(viewModel.isLiked ? .red : .gray)
+            Image(systemName: favoriteManager.isLiked(String(viewModel.productId)) ? "heart.fill" : "heart")
+              .foregroundColor(favoriteManager.isLiked(String(viewModel.productId)) ? .red : .gray)
           }
         }
       }

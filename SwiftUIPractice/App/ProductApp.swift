@@ -11,10 +11,12 @@ import SwiftUI
 struct ProductApp: App {
   
   @State private var container = AppContainer()
+  @State private var favoriteManager = FavoriteManager()
 
   var body: some Scene {
     WindowGroup {
       RootView(container: container)
+        .environment(favoriteManager)
     }
   }
 }
