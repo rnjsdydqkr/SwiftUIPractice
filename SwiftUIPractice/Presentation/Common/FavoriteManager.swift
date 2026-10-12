@@ -17,6 +17,10 @@ class FavoriteManager {
     self.favoriteIDs = repository.load()
   }
   
+  func loadLikeList() -> Set<String> {
+    return favoriteIDs
+  }
+  
   func isLiked(_ id: String) -> Bool {
     return favoriteIDs.contains(id)
   }

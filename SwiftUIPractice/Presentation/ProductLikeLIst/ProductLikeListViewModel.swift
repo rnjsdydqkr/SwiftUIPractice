@@ -17,12 +17,15 @@ final class ProductLikeListViewModel {
     self.repository = repository
   }
   
-  func loadProductList() async {
+  func loadProductList(favoriteIDs: Set<String>) async {
     state = .loading
     let result = await repository.getProducts()
     switch result {
     case .success(let res):
-      state = .loaded(res.products)
+      let productsLike = res.products.filter { product in
+        favoriteIDs.contains(String(product.id))
+      }
+      state = .loaded(productsLike)
     case .failure(let error):
       print(error.localizedDescription)
       state = .failed(error)

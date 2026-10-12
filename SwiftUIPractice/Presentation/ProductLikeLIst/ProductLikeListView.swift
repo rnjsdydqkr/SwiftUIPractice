@@ -11,6 +11,7 @@ import Kingfisher
 struct ProductLikeListView: View {
   
   @State private var viewModel: ProductLikeListViewModel
+  @Environment(FavoriteManager.self) private var favoritManager
   
   private let container: AppContainer
   init(container: AppContainer) {
@@ -21,17 +22,17 @@ struct ProductLikeListView: View {
   var body: some View {
     ProductList(container: container, products: viewModel.state.value ?? [])
       .navigationTitle("찜목록")
-      .task { await viewModel.loadProductList() }
+      .task { await viewModel.loadProductList(favoriteIDs: favoritManager.loadLikeList()) }
   }
 }
 
 struct ProductLikeList: View {
   let container: AppContainer
-  let products: [ProductResult]
+  let productsLike: [ProductResult]
   var body: some View {
-    List(products, id: \.id) { product in
-      NavigationLink(value: product) {
-        ProductLikeListCell(product: product)
+    List(productsLike, id: \.id) { productLike in
+      NavigationLink(value: productLike) {
+        ProductLikeListCell(product: productLike)
       }
     }
     .navigationDestination(for: ProductResult.self) { selectedProduct in
