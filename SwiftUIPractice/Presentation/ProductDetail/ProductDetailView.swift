@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ProductDetailView: View {
   
@@ -43,9 +44,14 @@ struct ProductDetail: View {
   let product: ProductResult?
   var body: some View {
     VStack {
-      AsyncImage(url: URL(string: (product?.images?.first ?? product?.thumbnail) ?? "")) { image in
-        image.image?.resizable()
-      }.frame(width: 400, height: 400)
+      KFImage(URL(string: (product?.images?.first ?? product?.thumbnail) ?? ""))
+        .placeholder({
+          ProgressView()
+        }).onFailure({ error in
+          print("이미지 로드 실패: \(error)")
+        })
+      .resizable()
+      .frame(width: 400, height: 400)
       Text(product?.title ?? "")
       Text(product?.brand ?? "")
       Text(String(product?.price ?? 0))
