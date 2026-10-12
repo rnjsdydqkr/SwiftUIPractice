@@ -15,6 +15,8 @@ final class AppContainer {
   private lazy var productRepository: ProductRepositoryProtocol =
   ProductRepository(network: productNetwork, userDefaults: FavoriteUserDefaults())
   
+  lazy var favoriteManager: FavoriteManager = FavoriteManager(repository: productRepository)
+  
   func makeProductListViewModel() -> ProductListViewModel {
     ProductListViewModel(repository: productRepository)
   }
