@@ -9,6 +9,6 @@ protocol ProductRepositoryProtocol {
   func getProducts() async -> Result<ProductResponseResult, NetworkError>
   func getDetailProduct(id: Int) async -> Result<ProductResult, NetworkError>
   
-  func load() -> Set<Int>
-  func save(_ ids: Set<Int>)
+  func load() -> Set<String>
+  func save(_ ids: Set<String>)
 }

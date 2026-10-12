@@ -8,8 +8,8 @@
 import Foundation
 
 protocol FavoriteUserDefaultsProtocol {
-  func load() -> Set<Int>
-  func save(_ ids: Set<Int>)
+  func load() -> Set<String>
+  func save(_ ids: Set<String>)
 }
 
 struct FavoriteUserDefaults: FavoriteUserDefaultsProtocol {
@@ -22,12 +22,12 @@ struct FavoriteUserDefaults: FavoriteUserDefaultsProtocol {
     self.key = key
   }
 
-  func load() -> Set<Int> {
-    let stored = defaults.array(forKey: key) as? [Int] ?? []
+  func load() -> Set<String> {
+    let stored = defaults.array(forKey: key) as? [String] ?? []
     return Set(stored)
   }
 
-  func save(_ ids: Set<Int>) {
+  func save(_ ids: Set<String>) {
     defaults.set(ids.sorted(), forKey: key)
   }
 }

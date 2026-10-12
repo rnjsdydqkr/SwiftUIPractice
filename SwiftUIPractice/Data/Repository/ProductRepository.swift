@@ -21,10 +21,10 @@ struct ProductRepository: ProductRepositoryProtocol {
     await network.getDetailProduct(id: id)
   }
   
-  func load() -> Set<Int> {
+  func load() -> Set<String> {
     userDefaults.load()
   }
-  func save(_ ids: Set<Int>) {
+  func save(_ ids: Set<String>) {
     userDefaults.save(ids)
   }
   
