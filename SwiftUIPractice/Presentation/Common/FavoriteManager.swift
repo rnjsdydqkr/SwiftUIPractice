@@ -10,7 +10,12 @@ import Observation
 
 @Observable
 class FavoriteManager {
-  var favoriteIDs: Set<String> = []
+  private let repository: ProductRepositoryProtocol
+  private var favoriteIDs: Set<String> = []
+  init(repository: ProductRepositoryProtocol) {
+    self.repository = repository
+    self.favoriteIDs = repository.load()
+  }
   
   func isLiked(_ id: String) -> Bool {
     return favoriteIDs.contains(id)
@@ -22,5 +27,8 @@ class FavoriteManager {
     } else {
       favoriteIDs.insert(id)
     }
+    
+    repository.save(favoriteIDs)
   }
+  
 }
