@@ -22,4 +22,8 @@ final class AppContainer {
   func makeProductDetailViewModel(productId: Int) -> ProductDetailViewModel {
     ProductDetailViewModel(repository: productRepository, productId: productId)
   }
+  
+  func makeProductLikeListViewModel() -> ProductLikeListViewModel {
+    ProductLikeListViewModel(repository: productRepository)
+  }
 }

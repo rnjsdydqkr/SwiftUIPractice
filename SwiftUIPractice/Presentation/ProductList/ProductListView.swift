@@ -10,6 +10,7 @@ import SwiftUI
 struct ProductListView: View {
   
   @State private var viewModel: ProductListViewModel
+  @Environment(FavoriteManager.self) private var favoritManager
   
   private let container: AppContainer
   init(container: AppContainer) {
@@ -19,8 +20,19 @@ struct ProductListView: View {
   
   var body: some View {
     ProductList(container: container, products: viewModel.state.value ?? [])
-      .navigationTitle(Text("목록"))
+      .navigationTitle("목록")
       .task { await viewModel.loadProductList() }
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          NavigationLink {
+            ProductLikeListView(container: container)
+          } label: {
+            Image(systemName: "heart.fill")
+              .foregroundColor(.gray)
+          }
+
+        }
+      }
   }
   
 }

@@ -11,6 +11,9 @@ struct ProductDetailView: View {
   
   @State private var viewModel: ProductDetailViewModel
   @Environment(FavoriteManager.self) private var favoriteManager
+  private var isLike: Bool {
+    favoriteManager.isLiked(String(viewModel.productId))
+  }
   
   private let container: AppContainer
   init(container: AppContainer, productId: Int) {
@@ -27,8 +30,8 @@ struct ProductDetailView: View {
           Button {
             favoriteManager.toggleLike(String(viewModel.productId))
           } label: {
-            Image(systemName: favoriteManager.isLiked(String(viewModel.productId)) ? "heart.fill" : "heart")
-              .foregroundColor(favoriteManager.isLiked(String(viewModel.productId)) ? .red : .gray)
+            Image(systemName: isLike ? "heart.fill" : "heart")
+              .foregroundColor(isLike ? .red : .gray)
           }
         }
       }
