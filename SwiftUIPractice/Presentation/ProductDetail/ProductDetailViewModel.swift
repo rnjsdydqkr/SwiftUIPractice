@@ -19,6 +19,8 @@ final class ProductDetailViewModel {
     self.productId = productId
   }
   
+  var isLiked: Bool = false
+  
   func loadProductDetail() async {
     state = .loading
     let result = await repository.getDetailProduct(id: productId)

@@ -21,6 +21,16 @@ struct ProductDetailView: View {
     ProductDetail(container: container, product: viewModel.state.value)
       .navigationTitle(viewModel.state.value?.title ?? "")
       .task { await viewModel.loadProductDetail() }
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button {
+            viewModel.isLiked.toggle()
+          } label: {
+            Image(systemName: viewModel.isLiked ? "heart.fill" : "heart")
+              .foregroundColor(viewModel.isLiked ? .red : .gray)
+          }
+        }
+      }
   }
 }
 
