@@ -20,7 +20,7 @@ struct ProductLikeListView: View {
   }
   
   var body: some View {
-    ProductList(container: container, products: viewModel.state.value ?? [])
+    ProductLikeList(container: container, productsLike: viewModel.state.value ?? [])
       .navigationTitle("찜목록")
       .task { await viewModel.loadProductList(favoriteIDs: favoritManager.loadLikeList()) }
   }

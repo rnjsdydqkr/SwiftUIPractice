@@ -25,11 +25,15 @@ struct ProductListView: View {
       .task { await viewModel.loadProductList() }
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
-          NavigationLink {
-            ProductLikeListView(container: container)
-          } label: {
+          NavigationLink(value: Route.likeList) {
             Image(systemName: "heart.fill")
               .foregroundColor(.gray)
+          }
+          .navigationDestination(for: Route.self) { route in
+            switch route {
+            case .likeList:
+              ProductLikeListView(container: container)
+            }
           }
 
         }

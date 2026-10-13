@@ -35,6 +35,7 @@
 		9827F60F306E9D0E008C9B40 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9827F60E306E9D0E008C9B40 /* ProductDetailView.swift */; };
 		9827F611306E9D1A008C9B40 /* ProductDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9827F610306E9D14008C9B40 /* ProductDetailViewModel.swift */; };
 		9827F617306EB96E008C9B40 /* LoadState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9827F616306EB967008C9B40 /* LoadState.swift */; };
+		9885FCDB307E630900542951 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9885FCDA307E630100542951 /* Route.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +98,7 @@
 		9827F60E306E9D0E008C9B40 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
 		9827F610306E9D14008C9B40 /* ProductDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailViewModel.swift; sourceTree = "<group>"; };
 		9827F616306EB967008C9B40 /* LoadState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadState.swift; sourceTree = "<group>"; };
+		9885FCDA307E630100542951 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -301,6 +303,7 @@
 			children = (
 				9827F616306EB967008C9B40 /* LoadState.swift */,
 				26BCE9B1307CAD27007CB87E /* FavoriteManager.swift */,
+				9885FCDA307E630100542951 /* Route.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -462,6 +465,7 @@
 				9827F60B306E9CC8008C9B40 /* ProductListView.swift in Sources */,
 				9827F617306EB96E008C9B40 /* LoadState.swift in Sources */,
 				9827F5E9306E8101008C9B40 /* SessionProtocol.swift in Sources */,
+				9885FCDB307E630900542951 /* Route.swift in Sources */,
 				9827F5F3306E8202008C9B40 /* APIProtocol.swift in Sources */,
 				9827F5FB306E8C46008C9B40 /* ProductSession.swift in Sources */,
 				26BCE9B2307CAD30007CB87E /* FavoriteManager.swift in Sources */,
