@@ -46,9 +46,9 @@ struct ProductList: View {
   let container: AppContainer
   let products: [ProductResult]
   var body: some View {
-    List(products, id: \.id) { product in
+    List(Array(products.enumerated()), id: \.element.id) { index, product in
       NavigationLink(value: product) {
-        ProductListCell(product: product)
+        ProductListCell(products: products, productIndex: index)
       }
     }
     .navigationDestination(for: ProductResult.self) { selectedProduct in
@@ -58,27 +58,71 @@ struct ProductList: View {
 }
 
 struct ProductListCell: View {
-  let product: ProductResult
+  @State private var activePrefetchers: [Int: ImagePrefetcher] = [:]
+  
+  let products: [ProductResult]
+  let productIndex: Int
+  let itemSize = CGSize(width: 60, height: 60)
+  private var kingfisherOptions: KingfisherOptionsInfo {
+    [
+      .processor(DownsamplingImageProcessor(size: itemSize)),
+      .scaleFactor(UIScreen.main.scale),
+      .cacheOriginalImage
+    ]
+  }
   var body: some View {
     HStack {
-      KFImage(URL(string: product.thumbnail ?? ""))
+      KFImage(URL(string: products[productIndex].thumbnail ?? ""))
+        .setProcessor(DownsamplingImageProcessor(size: itemSize))
+        .scaleFactor(UIScreen.main.scale)
+        .cacheOriginalImage()
         .placeholder({
           ProgressView()
         }).onFailure({ error in
           print("이미지 로드 실패: \(error)")
         })
       .resizable()
-      .frame(width: 60, height: 60)
+      .frame(width: itemSize.width, height: itemSize.height)
+      .onAppear {
+        preFetchNextImages(products: products, currentIndex: productIndex)
+      }
+      .onDisappear {
+        cancelPrefetching(at: productIndex)
+      }
         
       VStack(alignment: .leading) {
-        Text(product.title)
+        Text(products[productIndex].title)
           .font(Font.body.bold())
-        Text(product.brand ?? "")
+        Text(products[productIndex].brand ?? "")
           .font(Font.body.italic())
-        Text(String(product.price))
+        Text(String(products[productIndex].price))
       }
     }
   }
+  
+  private func preFetchNextImages(products: [ProductResult], currentIndex: Int) {
+    let productImageURLs: [URL] = products.compactMap{ URL(string: $0.thumbnail ?? "") }
+    let nextIndex: Int = currentIndex + 1
+    let maxIndex: Int = products.count - 1
+    guard nextIndex <= maxIndex, maxIndex >= 0 else { return }
+    let prefetchRange = nextIndex...min(currentIndex + 6, maxIndex)
+    
+    let urlsToPrefetch = prefetchRange.map { productImageURLs[$0] }
+    
+    let prefetcher = ImagePrefetcher(
+      urls: urlsToPrefetch,
+      options: kingfisherOptions
+    )
+    prefetcher.start()
+    
+    activePrefetchers[currentIndex] = prefetcher
+  }
+  
+  private func cancelPrefetching(at index: Int) {
+    activePrefetchers[index]?.stop()
+    activePrefetchers[index] = nil
+  }
+  
 }
 
 #Preview {
