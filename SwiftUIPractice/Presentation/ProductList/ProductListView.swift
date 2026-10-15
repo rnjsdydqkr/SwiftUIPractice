@@ -59,22 +59,15 @@ struct ProductList: View {
 
 struct ProductListCell: View {
   @Environment(\.displayScale) private var displayScale
+  @State private var thumbnailPrefetcher = ProductThumbnailPrefetcher()
   
   let products: [ProductResult]
   let productIndex: Int
-  let itemSize = CGSize(width: 60, height: 60)
-  private var kingfisherOptions: KingfisherOptionsInfo {
-    [
-      .processor(DownsamplingImageProcessor(size: itemSize)),
-      .scaleFactor(displayScale),
-      .cacheOriginalImage,
-      .alsoPrefetchToMemory
-    ]
-  }
+  
   var body: some View {
     HStack {
       KFImage(URL(string: products[productIndex].thumbnail ?? ""))
-        .setProcessor(DownsamplingImageProcessor(size: itemSize))
+        .setProcessor(ProductThumbnail.processor)
         .scaleFactor(displayScale)
         .cacheOriginalImage()
         .placeholder({
@@ -83,9 +76,15 @@ struct ProductListCell: View {
           print("이미지 로드 실패: \(error)")
         })
       .resizable()
-      .frame(width: itemSize.width, height: itemSize.height)
+      .frame(width: ProductThumbnail.size.width, height: ProductThumbnail.size.height)
       .onAppear {
-        preFetchNextImages(products: products, currentIndex: productIndex)
+        thumbnailPrefetcher.rowDidAppear(index: productIndex, products: products, displayScale: displayScale)
+      }
+      .onChange(of: products) {
+        thumbnailPrefetcher.stopAll()
+      }
+      .onDisappear {
+        thumbnailPrefetcher.stopAll()
       }
         
       VStack(alignment: .leading) {
@@ -98,16 +97,57 @@ struct ProductListCell: View {
     }
   }
   
-  private func preFetchNextImages(products: [ProductResult], currentIndex: Int) {
-    let nextIndex: Int = currentIndex + 1
-    let lastIndex: Int = min(currentIndex + 6, products.count - 1)
-    guard nextIndex <= lastIndex else { return }
+}
+
+enum ProductThumbnail {
+  static let size = CGSize(width: 60, height: 60)
+  static let processor = DownsamplingImageProcessor(size: size)
+}
+
+@MainActor
+final class ProductThumbnailPrefetcher {
+  private let prefetchDistance = 6
+  private var prefetchedUpTo = -1
+  private var activePrefetchers: [(range: ClosedRange<Int>, prefetcher: ImagePrefetcher)] = []
+  
+  func rowDidAppear(index: Int, products: [ProductResult], displayScale: CGFloat) {
+    stopPrefetching(reachedBy: index)
     
-    let urlsToPrefetch: [URL] = products[nextIndex...lastIndex].compactMap{ URL(string: $0.thumbnail ?? "") }
+    let start = index + 1
+    let end = min(index + prefetchDistance, products.count - 1)
+    guard start <= end else { return }
+    prefetchedUpTo = end
     
-    ImagePrefetcher(urls: urlsToPrefetch, options: kingfisherOptions).start()
+    let urlsToPrefetch: [URL] = products[start...end].compactMap {
+      URL(string: $0.thumbnail ?? "")
+    }
+    
+    let prefetcher = ImagePrefetcher(urls: urlsToPrefetch, options: options(scale: displayScale))
+    prefetcher.start()
+    
+    activePrefetchers.append((start...end, prefetcher))
   }
   
+  func stopAll() {
+    activePrefetchers.forEach { $0.prefetcher.stop() }
+    activePrefetchers.removeAll()
+    prefetchedUpTo = -1
+  }
+  
+  private func stopPrefetching(reachedBy index: Int) {
+    let reached = activePrefetchers.filter { $0.range.upperBound <= index }
+    reached.forEach { $0.prefetcher.stop() }
+    activePrefetchers.removeAll { $0.range.upperBound <= index }
+  }
+  
+  private func options(scale: CGFloat) -> KingfisherOptionsInfo {
+    [
+      .processor(ProductThumbnail.processor),
+      .scaleFactor(scale),
+      .cacheOriginalImage,
+      .alsoPrefetchToMemory
+    ]
+  }
 }
 
 #Preview {
