@@ -67,14 +67,15 @@ struct ProductListCell: View {
     [
       .processor(DownsamplingImageProcessor(size: itemSize)),
       .scaleFactor(displayScale),
-      .cacheOriginalImage
+      .cacheOriginalImage,
+      .alsoPrefetchToMemory
     ]
   }
   var body: some View {
     HStack {
       KFImage(URL(string: products[productIndex].thumbnail ?? ""))
         .setProcessor(DownsamplingImageProcessor(size: itemSize))
-        .scaleFactor(UIScreen.main.scale)
+        .scaleFactor(displayScale)
         .cacheOriginalImage()
         .placeholder({
           ProgressView()
