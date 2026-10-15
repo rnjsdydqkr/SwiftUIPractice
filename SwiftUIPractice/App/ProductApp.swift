@@ -13,6 +13,7 @@ struct ProductApp: App {
   @State private var container = AppContainer()
 
   init() {
+    ImageCache.default.memoryStorage.config.totalCostLimit = 50 * 1024 * 1024
     ImageCache.default.diskStorage.config.sizeLimit = 200 * 1024 * 1024
   }
 
