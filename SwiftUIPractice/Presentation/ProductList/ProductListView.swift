@@ -58,7 +58,7 @@ struct ProductList: View {
 }
 
 struct ProductListCell: View {
-  @State private var activePrefetchers: [Int: ImagePrefetcher] = [:]
+  @Environment(\.displayScale) private var displayScale
   
   let products: [ProductResult]
   let productIndex: Int
@@ -66,7 +66,7 @@ struct ProductListCell: View {
   private var kingfisherOptions: KingfisherOptionsInfo {
     [
       .processor(DownsamplingImageProcessor(size: itemSize)),
-      .scaleFactor(UIScreen.main.scale),
+      .scaleFactor(displayScale),
       .cacheOriginalImage
     ]
   }
@@ -86,9 +86,6 @@ struct ProductListCell: View {
       .onAppear {
         preFetchNextImages(products: products, currentIndex: productIndex)
       }
-      .onDisappear {
-        cancelPrefetching(at: productIndex)
-      }
         
       VStack(alignment: .leading) {
         Text(products[productIndex].title)
@@ -102,6 +99,7 @@ struct ProductListCell: View {
   
   private func preFetchNextImages(products: [ProductResult], currentIndex: Int) {
     let productImageURLs: [URL] = products.compactMap{ URL(string: $0.thumbnail ?? "") }
+    guard productImageURLs.count == products.count else { return }
     let nextIndex: Int = currentIndex + 1
     let maxIndex: Int = products.count - 1
     guard nextIndex <= maxIndex, maxIndex >= 0 else { return }
@@ -109,18 +107,7 @@ struct ProductListCell: View {
     
     let urlsToPrefetch = prefetchRange.map { productImageURLs[$0] }
     
-    let prefetcher = ImagePrefetcher(
-      urls: urlsToPrefetch,
-      options: kingfisherOptions
-    )
-    prefetcher.start()
-    
-    activePrefetchers[currentIndex] = prefetcher
-  }
-  
-  private func cancelPrefetching(at index: Int) {
-    activePrefetchers[index]?.stop()
-    activePrefetchers[index] = nil
+    ImagePrefetcher(urls: urlsToPrefetch, options: kingfisherOptions).start()
   }
   
 }
