@@ -98,14 +98,11 @@ struct ProductListCell: View {
   }
   
   private func preFetchNextImages(products: [ProductResult], currentIndex: Int) {
-    let productImageURLs: [URL] = products.compactMap{ URL(string: $0.thumbnail ?? "") }
-    guard productImageURLs.count == products.count else { return }
     let nextIndex: Int = currentIndex + 1
-    let maxIndex: Int = products.count - 1
-    guard nextIndex <= maxIndex, maxIndex >= 0 else { return }
-    let prefetchRange = nextIndex...min(currentIndex + 6, maxIndex)
+    let lastIndex: Int = min(currentIndex + 6, products.count - 1)
+    guard nextIndex <= lastIndex else { return }
     
-    let urlsToPrefetch = prefetchRange.map { productImageURLs[$0] }
+    let urlsToPrefetch: [URL] = products[nextIndex...lastIndex].compactMap{ URL(string: $0.thumbnail ?? "") }
     
     ImagePrefetcher(urls: urlsToPrefetch, options: kingfisherOptions).start()
   }
