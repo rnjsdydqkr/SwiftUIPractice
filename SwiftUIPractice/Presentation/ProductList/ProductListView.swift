@@ -43,13 +43,25 @@ struct ProductListView: View {
 }
 
 struct ProductList: View {
+  @Environment(\.displayScale) private var displayScale
+  @State private var thumbnailPrefetcher = ProductThumbnailPrefetcher()
   let container: AppContainer
   let products: [ProductResult]
+  
   var body: some View {
     List(Array(products.enumerated()), id: \.element.id) { index, product in
       NavigationLink(value: product) {
         ProductListCell(products: products, productIndex: index)
       }
+      .onAppear {
+        thumbnailPrefetcher.rowDidAppear(index: index, products: products, displayScale: displayScale)
+      }
+    }
+    .onChange(of: products) {
+      thumbnailPrefetcher.stopAll()
+    }
+    .onDisappear {
+      thumbnailPrefetcher.stopAll()
     }
     .navigationDestination(for: ProductResult.self) { selectedProduct in
       ProductDetailView(container: container, productId: selectedProduct.id)
@@ -59,8 +71,6 @@ struct ProductList: View {
 
 struct ProductListCell: View {
   @Environment(\.displayScale) private var displayScale
-  @State private var thumbnailPrefetcher = ProductThumbnailPrefetcher()
-  
   let products: [ProductResult]
   let productIndex: Int
   
@@ -77,15 +87,6 @@ struct ProductListCell: View {
         })
       .resizable()
       .frame(width: ProductThumbnail.size.width, height: ProductThumbnail.size.height)
-      .onAppear {
-        thumbnailPrefetcher.rowDidAppear(index: productIndex, products: products, displayScale: displayScale)
-      }
-      .onChange(of: products) {
-        thumbnailPrefetcher.stopAll()
-      }
-      .onDisappear {
-        thumbnailPrefetcher.stopAll()
-      }
         
       VStack(alignment: .leading) {
         Text(products[productIndex].title)
@@ -113,7 +114,7 @@ final class ProductThumbnailPrefetcher {
   func rowDidAppear(index: Int, products: [ProductResult], displayScale: CGFloat) {
     stopPrefetching(reachedBy: index)
     
-    let start = index + 1
+    let start = max(index + 1, prefetchedUpTo + 1)
     let end = min(index + prefetchDistance, products.count - 1)
     guard start <= end else { return }
     prefetchedUpTo = end
